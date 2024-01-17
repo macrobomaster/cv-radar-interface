@@ -40,7 +40,7 @@ def select_point(event, x, y, flags, param):
 
 
 def main():
-    img_path = r"sample_image.jpg"
+    img_path = r"sample_images/sample_image.jpg"
     window_name = "Sample Image"
     arena_corners = []
 
