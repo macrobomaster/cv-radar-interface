@@ -108,8 +108,8 @@ def main():
         if xy:
             print(f"Clicked point: {xy}")
             print(f"Transformed point: {radar.transform(xy)}")
-            xy.clear()
             cv2.circle(ref_img, (xy[0], xy[1]), 3, (255, 255, 0), -1)
+            xy.clear()
 
         if cv2.waitKey(1) == 27:  #'Esc' key
             break
