@@ -2,8 +2,8 @@ from radar import Radar
 import cv2
 
 
-# Returns the same list of points, but in this order:
-# Bottom Right, Bottom Left, Top left, Top right
+#! Click points in this order:
+#! Top Left, Top Right, Bottom Right Bottom, LEft
 def order_points(rect: list[list[float]]) -> list[list[int]]:
     points = rect.copy()
     points.sort(key=lambda x: x[1])
@@ -40,50 +40,81 @@ def select_point(event, x, y, flags, param):
 
 
 def main():
-    img_path = r"sample_images/sample_image.jpg"
+    img_path = r"sample_images\keyboard\keyboard1.jpg"
+    ref_img_path = r"sample_images\keyboard\keyboard0.jpg"
+
     window_name = "Sample Image"
+    ref_window_name = "Reference Image"
+
     arena_corners = []
+    ref_arena_corners = []
 
     img = cv2.imread(img_path)
+    ref_img = cv2.imread(ref_img_path)
     img = cv2.resize(img, (int(img.shape[1] / 3), int(img.shape[0] / 3)))
+    ref_img = cv2.resize(
+        ref_img, (int(ref_img.shape[1] / 3), int(ref_img.shape[0] / 3))
+    )
+
     cv2.namedWindow(window_name)
+    cv2.namedWindow(ref_window_name)
     cv2.setMouseCallback(window_name, select_corner, [img, arena_corners])
+    cv2.setMouseCallback(ref_window_name, select_corner, [ref_img, ref_arena_corners])
 
     while len(arena_corners) < 4:
         cv2.imshow(window_name, img)
-        print(arena_corners)
 
         # Break the loop if the 'Esc' key is pressed
         if cv2.waitKey(1) == 27:
             break
 
-    arena_corners = order_points(arena_corners)
+    print(
+        f"TL: {arena_corners[0]} \nTR: {arena_corners[1]} \nBR: {arena_corners[2]} \nBL: {arena_corners[3]}"
+    )
 
     cv2.line(img, arena_corners[0], arena_corners[1], (255, 255, 0), 2, -1)
     cv2.line(img, arena_corners[1], arena_corners[2], (255, 255, 0), 2, -1)
     cv2.line(img, arena_corners[2], arena_corners[3], (255, 255, 0), 2, -1)
     cv2.line(img, arena_corners[3], arena_corners[0], (255, 255, 0), 2, -1)
+    
+    while len(ref_arena_corners) < 4:
+        cv2.imshow(ref_window_name, ref_img)
 
-    radar = Radar(arena_corners, 100, 100)
+        # Break the loop if the 'Esc' key is pressed
+        if cv2.waitKey(1) == 27:
+            break
+
+    print(
+        f"TL: {ref_arena_corners[0]} \nTR: {ref_arena_corners[1]} \nBR: {ref_arena_corners[2]} \nBL: {ref_arena_corners[3]}"
+    )
+
+
+
+    cv2.line(ref_img, ref_arena_corners[0], ref_arena_corners[1], (255, 255, 0), 2, -1)
+    cv2.line(ref_img, ref_arena_corners[1], ref_arena_corners[2], (255, 255, 0), 2, -1)
+    cv2.line(ref_img, ref_arena_corners[2], ref_arena_corners[3], (255, 255, 0), 2, -1)
+    cv2.line(ref_img, ref_arena_corners[3], ref_arena_corners[0], (255, 255, 0), 2, -1)
+    radar = Radar(arena_corners, 1008, 454)
 
     xy = []
 
     cv2.setMouseCallback(window_name, select_point, [img, xy])
 
-
     while True:
         cv2.imshow(window_name, img)
+        cv2.imshow(ref_window_name, ref_img)
 
-        #! CAN DELETE LATER
+        #! Data display
         if xy:
             print(f"Clicked point: {xy}")
             print(f"Transformed point: {radar.transform(xy)}")
             xy.clear()
+            cv2.circle(ref_img, (xy[0], xy[1]), 3, (255, 255, 0), -1)
 
-        if cv2.waitKey(1) == 27: #'Esc' key
+        if cv2.waitKey(1) == 27:  #'Esc' key
             break
 
-
+    
     cv2.destroyAllWindows()
 
 
