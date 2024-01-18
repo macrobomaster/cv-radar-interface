@@ -76,7 +76,8 @@ def main():
     cv2.line(img, arena_corners[1], arena_corners[2], (255, 255, 0), 2, -1)
     cv2.line(img, arena_corners[2], arena_corners[3], (255, 255, 0), 2, -1)
     cv2.line(img, arena_corners[3], arena_corners[0], (255, 255, 0), 2, -1)
-    
+    cv2.imshow(window_name, img)
+
     while len(ref_arena_corners) < 4:
         cv2.imshow(ref_window_name, ref_img)
 
@@ -88,17 +89,16 @@ def main():
         f"TL: {ref_arena_corners[0]} \nTR: {ref_arena_corners[1]} \nBR: {ref_arena_corners[2]} \nBL: {ref_arena_corners[3]}"
     )
 
-
-
     cv2.line(ref_img, ref_arena_corners[0], ref_arena_corners[1], (255, 255, 0), 2, -1)
     cv2.line(ref_img, ref_arena_corners[1], ref_arena_corners[2], (255, 255, 0), 2, -1)
     cv2.line(ref_img, ref_arena_corners[2], ref_arena_corners[3], (255, 255, 0), 2, -1)
     cv2.line(ref_img, ref_arena_corners[3], ref_arena_corners[0], (255, 255, 0), 2, -1)
-    radar = Radar(arena_corners, 1008, 454)
+    radar = Radar(arena_corners, ref_arena_corners)
 
     xy = []
 
     cv2.setMouseCallback(window_name, select_point, [img, xy])
+    cv2.setMouseCallback(ref_window_name, lambda *args: None)
 
     while True:
         cv2.imshow(window_name, img)
@@ -107,14 +107,21 @@ def main():
         #! Data display
         if xy:
             print(f"Clicked point: {xy}")
-            print(f"Transformed point: {radar.transform(xy)}")
-            cv2.circle(ref_img, (xy[0], xy[1]), 3, (255, 255, 0), -1)
+            transform = radar.transform(xy)
+            print(f"Transformed point: {transform}")
+            cv2.circle(img, (xy[0], xy[1]), 3, (255, 255, 0), -1)
+            cv2.circle(
+                ref_img,
+                (int(transform[0][0][0]), int(transform[0][0][1])),
+                3,
+                (255, 255, 0),
+                -1,
+            )
             xy.clear()
 
         if cv2.waitKey(1) == 27:  #'Esc' key
             break
 
-    
     cv2.destroyAllWindows()
 
 
