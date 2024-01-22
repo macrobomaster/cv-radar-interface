@@ -3,7 +3,7 @@ import cv2
 
 
 #! Click points in this order:
-#! Top Left, Top Right, Bottom Right Bottom, LEft
+#! Top Left, Top Right, Bottom Right, Bottom Left
 def order_points(rect: list[list[float]]) -> list[list[int]]:
     points = rect.copy()
     points.sort(key=lambda x: x[1])
