@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "cv-radar-interface"
+version = "0.1"
+description = "Robomaster Radar Interface and UI"
+authors = ["Your Name <you@example.com>"]
+license = "None"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+opencv-python = "^4.9.0.80"
+tk = "^0.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
