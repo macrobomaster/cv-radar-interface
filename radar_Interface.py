@@ -75,15 +75,12 @@ class App(customtkinter.CTk):
 
 
     def update_minimap(self, locations):
-        #!Writing to image slows down UI significantly
-        battleground_img = Image.open("./assets/battleground.png").resize((560,300))
+        copy = self.battleground_img.copy()
         for location in locations:
             x, y = location
-            ImageDraw.Draw(battleground_img).polygon([(x-3, y-3),(x-3, y+3),(x+3, y+3),(x+3, y-3)], fill="red",width=2)
-        
-        battleground_img.save("./assets/battleground_update.png")
-        #!Comment until here to remove lag
-        self.minimap.configure(dark_image= Image.open(os.path.join(self.image_path, "battleground_update.png")))
+            ImageDraw.Draw(copy).polygon([(x-3, y-3),(x-3, y+3),(x+3, y+3),(x+3, y-3)], fill="red",width=2)
+
+        self.minimap.configure(dark_image=copy)
     
     def update_video_feed(self):
         success, frame = self.vidcap.read()
