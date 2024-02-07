@@ -3,14 +3,21 @@ import os
 from PIL import Image, ImageDraw
 import cv2
 
+ASSET_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
+WEBCAM = 0
+SAMPLE_VID = os.path.join(ASSET_PATH, "sample.mp4")
+
 
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
 
+        self.minsize(1280, 720)
+        self.maxsize(1920, 1080)
+
+
         self.title("Radar Station MacRobomaster 2024 Interface")
-        self.geometry("1200x800")
 
         # set grid layout 1x2
         self.grid_rowconfigure(0, weight=1)
@@ -23,10 +30,12 @@ class App(customtkinter.CTk):
         self.logo_image = customtkinter.CTkImage(Image.open(os.path.join(self.image_path, "MacRM_logo_black.png")), size=(26, 26))
         self.minimap = customtkinter.CTkImage(self.battleground_img, size=(560,300))
 
-        self.vidcap = cv2.VideoCapture(os.path.join(self.image_path, "mem.mp4"))
+        
+
+        self.vidcap = cv2.VideoCapture(SAMPLE_VID)
         _, frame = self.vidcap.read()
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = customtkinter.CTkImage(Image.fromarray(frame).resize((560,300)), size=(560, 300))
+        frame = customtkinter.CTkImage(Image.fromarray(frame).resize((640, 480)), size=(640, 480))
         self.video_feed = frame
 
         # create navigation frame / left sidebar
@@ -52,7 +61,7 @@ class App(customtkinter.CTk):
         self.home_frame_minimap.grid(row=0, column=0, padx=20, pady=10, sticky="s")
 
         # create video feed in home frame
-        self.home_frame_video_feed = customtkinter.CTkLabel(self.home_frame, corner_radius=0, text="", image=self.video_feed)
+        self.home_frame_video_feed = customtkinter.CTkLabel(self.home_frame, corner_radius=0, text="Video IN\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", image=self.video_feed)
         self.home_frame_video_feed.grid(row=1, column=0, padx=20, pady=10)
 
         # create info box in home frame
@@ -60,17 +69,19 @@ class App(customtkinter.CTk):
         self.textbox.grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
         self.textbox.insert("0.0", "Ref package info\n\n" + "Blue Standard 3 : 10, 20\nBlue Standard 3 : 7, 14\nBlue Hero 1 : 5, 10 \n\n" )
 
+        # quit button
+        self.quit_button = customtkinter.CTkButton(self.home_frame, text="Quit", command=self.destroy)
+        self.quit_button.grid(row=0, column=3, padx=(20,0),  pady=(20, 0), sticky="n")
+
         # select default frame
         self.time = 0
         self.update()
-
 
     def update(self):
         self.locations = [(100+self.time, 100+self.time),(20+self.time, 120+self.time)]
         self.update_minimap(self.locations)
         self.update_video_feed()
         self.time+=1
-        print("UI refreshed")
         self.after(1, self.update)
 
 
@@ -85,7 +96,7 @@ class App(customtkinter.CTk):
     def update_video_feed(self):
         success, frame = self.vidcap.read()
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = Image.fromarray(frame).resize((560,300))
+        frame = Image.fromarray(frame).resize((640, 480))
 
         if success:
             self.video_feed.configure(dark_image=frame)
@@ -96,4 +107,5 @@ class App(customtkinter.CTk):
 
 if __name__ == "__main__":
     app = App()
+    app._state_before_windows_set_titlebar_color = 'zoomed'
     app.mainloop()
