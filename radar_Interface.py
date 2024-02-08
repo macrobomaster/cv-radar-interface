@@ -13,16 +13,20 @@ class App(customtkinter.CTk):
         super().__init__()
 
 
-        self.minsize(1280, 720)
-        self.maxsize(1920, 1080)
+        # self.minsize(1280, 720)
+        # self.maxsize(1920, 1080)
 
 
         self.title("Radar Station MacRobomaster 2024 Interface")
+        self.geometry("1280x1000")
 
         # set grid layout 1x2
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-        
+        self.blue_labels = []
+        self.blue_slides = []
+        self.red_labels = []
+        self.red_slides = []
 
         # image loading
         self.image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
@@ -66,12 +70,17 @@ class App(customtkinter.CTk):
 
         # create info box in home frame
         self.textbox = customtkinter.CTkTextbox(self.home_frame, width=250)
-        self.textbox.grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.textbox.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
         self.textbox.insert("0.0", "Ref package info\n\n" + "Blue Standard 3 : 10, 20\nBlue Standard 3 : 7, 14\nBlue Hero 1 : 5, 10 \n\n" )
+
+        # create robot info box in home frame
+        self.robot_info_frame = customtkinter.CTkFrame(self.home_frame,fg_color=("gray80", "gray15"))
+        self.robot_info_frame.grid(row=1, column=1,padx=(20, 0), pady=(20, 0), sticky="n")
+        self.get_robot_status_frame()
 
         # quit button
         self.quit_button = customtkinter.CTkButton(self.home_frame, text="Quit", command=self.destroy)
-        self.quit_button.grid(row=0, column=3, padx=(20,0),  pady=(20, 0), sticky="n")
+        self.quit_button.grid(row=0, column=2, padx=(20,0),  pady=(20, 0), sticky="n")
 
         # select default frame
         self.time = 0
@@ -82,9 +91,19 @@ class App(customtkinter.CTk):
         self.update_minimap(self.locations)
         self.update_video_feed()
         self.time+=1
-        self.after(1, self.update)
+        self.after(10, self.update)
 
-
+    #Get robot status Widget setup.
+    def get_robot_status_frame(self):
+        for team_num in range(2): 
+            for i in range(7):
+                if team_num == 0:
+                    self.blue_labels.append(customtkinter.CTkLabel(self.robot_info_frame, text="Blue "+str(i)+" : ").grid(row=i, column=team_num*2, padx=10))
+                    self.blue_slides.append(customtkinter.CTkProgressBar(self.robot_info_frame, orientation="horizontal",width = 100).grid(row=i, column=team_num+1,padx=(0,5)))
+                else:
+                    self.red_labels.append(customtkinter.CTkLabel(self.robot_info_frame, text="Red "+str(i)+" : ").grid(row=i, column=team_num*2, padx=10))
+                    self.red_slides.append(customtkinter.CTkProgressBar(self.robot_info_frame, orientation="horizontal",width = 100).grid(row=i, column=team_num*2+1,padx=(0,5)))
+    
     def update_minimap(self, locations):
         copy = self.battleground_img.copy()
         for location in locations:
@@ -107,5 +126,5 @@ class App(customtkinter.CTk):
 
 if __name__ == "__main__":
     app = App()
-    app._state_before_windows_set_titlebar_color = 'zoomed'
+    #app._state_before_windows_set_titlebar_color = 'zoomed'
     app.mainloop()
