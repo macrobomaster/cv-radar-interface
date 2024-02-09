@@ -2,6 +2,7 @@ import customtkinter
 import os
 from PIL import Image, ImageDraw
 import cv2
+from threading import Thread
 
 ASSET_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
 WEBCAM = 0
@@ -84,7 +85,9 @@ class App(customtkinter.CTk):
 
         # select default frame
         self.time = 0
-        self.update()
+        thread1 = Thread(target = self.update,args=())
+        thread1.start()
+        
 
     def update(self):
         self.locations = [(100+self.time, 100+self.time),(20+self.time, 120+self.time)]
@@ -110,7 +113,7 @@ class App(customtkinter.CTk):
             x, y = location
             ImageDraw.Draw(copy).polygon([(x-3, y-3),(x-3, y+3),(x+3, y+3),(x+3, y-3)], fill="red",width=2)
 
-        self.minimap.configure(dark_image=copy)
+        self.minimap.configure(light_image=copy,dark_image=copy)
     
     def update_video_feed(self):
         success, frame = self.vidcap.read()
@@ -118,7 +121,7 @@ class App(customtkinter.CTk):
         frame = Image.fromarray(frame).resize((640, 480))
 
         if success:
-            self.video_feed.configure(dark_image=frame)
+            self.video_feed.configure(light_image=frame,dark_image=frame)
 
     def change_appearance_mode_event(self, new_appearance_mode):
         customtkinter.set_appearance_mode(new_appearance_mode)
